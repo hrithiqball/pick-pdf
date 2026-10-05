@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "node_modules/.tmp/tsconfig.webworker.tsbuildinfo",
+    "lib": ["ES2024", "WebWorker"],
+    "types": ["vite/client"]
+  },
+  "include": [
+    "src/client/pdf/unlock.worker.ts",
+    "src/client/pdf/qpdf.ts",
+    "src/client/pdf/protocol.ts"
+  ]
+}

@@ -7,7 +7,7 @@ const { open } = useBrowser();
 describe("open link", () => {
   it("full round trip: upload in one browser, unlock once in another", async () => {
     // Sender
-    const sender = await open("/");
+    const sender = await open("/share");
     const original = Buffer.from("%PDF-1.7\nround trip ✓\n%%EOF\n");
     await sender.page.locator("#file-input").setInputFiles({
       name: "quarterly report.pdf",

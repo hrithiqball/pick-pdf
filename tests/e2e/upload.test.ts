@@ -12,7 +12,7 @@ const pdf = {
 
 describe("upload page", () => {
   it("renders the upload form with labelled controls", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
 
     expect(await page.title()).toBe("pick·pdf");
     expect(await page.getByRole("heading", { level: 1 }).textContent()).toBe("Seal a file");
@@ -28,13 +28,13 @@ describe("upload page", () => {
   });
 
   it("asks for a file before anything else", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
     await page.getByRole("button", { name: "Encrypt & upload" }).click();
     expect(await page.getByRole("alert").textContent()).toBe("Choose a file to seal.");
   });
 
   it("validates password length and confirmation", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
     await page.locator("#file-input").setInputFiles(pdf);
     const password = page.locator("#view-upload").getByLabel("Password", { exact: true });
     const confirm = page.locator("#view-upload").getByLabel("Confirm password");
@@ -65,7 +65,7 @@ describe("upload page", () => {
   });
 
   it("shows the chosen file and lets you remove it", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
     await page.locator("#file-input").setInputFiles(pdf);
 
     expect(await page.locator("#file-name").textContent()).toBe("contract.pdf");
@@ -78,7 +78,7 @@ describe("upload page", () => {
   });
 
   it("accepts a dropped file", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
     await page.evaluate(() => {
       const transfer = new DataTransfer();
       transfer.items.add(new File(["dropped"], "dropped.pdf", { type: "application/pdf" }));
@@ -90,7 +90,7 @@ describe("upload page", () => {
   });
 
   it("rejects empty and oversized files", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
     await page.locator("#file-input").setInputFiles({
       name: "empty.pdf",
       mimeType: "application/pdf",
@@ -113,7 +113,7 @@ describe("upload page", () => {
   });
 
   it("toggles password visibility for both fields", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
     const toggle = page.locator("#view-upload .reveal");
     await toggle.click();
     expect(await toggle.getAttribute("aria-pressed")).toBe("true");
@@ -125,7 +125,7 @@ describe("upload page", () => {
   });
 
   it("encrypts, uploads and shows a copyable share link", async () => {
-    const { page } = await open("/");
+    const { page } = await open("/share");
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
       origin: baseURL,
     });
@@ -176,7 +176,7 @@ describe("upload page", () => {
   });
 
   it("shows an error and restores the form when the upload fails", async () => {
-    const { page, errors } = await open("/");
+    const { page, errors } = await open("/share");
     await page.route("**/api/files", (route) =>
       route.fulfill({ status: 500, contentType: "application/json", body: '{"error":"boom"}' }),
     );
@@ -197,7 +197,10 @@ describe("upload page", () => {
   });
 
   it("fits a small phone screen without horizontal scrolling", async () => {
-    const { page } = await open("/", { viewport: { width: 320, height: 640 }, isMobile: true });
+    const { page } = await open("/share", {
+      viewport: { width: 320, height: 640 },
+      isMobile: true,
+    });
     await page.locator("#file-input").setInputFiles({
       ...pdf,
       name: `${"very-long-file-name-".repeat(8)}.pdf`,

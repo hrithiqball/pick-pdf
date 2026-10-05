@@ -14,6 +14,9 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@neslinesli93/qpdf-wasm": ["./src/client/pdf/qpdf-wasm.d.ts"]
+    }
   }
 }

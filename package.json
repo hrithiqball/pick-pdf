@@ -4,6 +4,9 @@
   "private": true,
   "description": "Password-protected, burn-after-reading file drop on Cloudflare Workers",
   "type": "module",
+  "dependencies": {
+    "@neslinesli93/qpdf-wasm": "0.3.0"
+  },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.62.5",
     "@types/node": "^24.0.0",

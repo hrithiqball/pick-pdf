@@ -1,6 +1,19 @@
 # pick·pdf
 
-Share a file behind a password. The first person to unlock it gets the file, and then it's deleted.
+Remove the password from a PDF, right in your browser. There's also a one-time link for sharing a file, which is deleted after the first download.
+
+## Unlock a PDF (home page)
+
+- **Local only.** [qpdf](https://github.com/qpdf/qpdf) compiled to WebAssembly runs in a Web Worker. The PDF and its password never leave the device. The page makes no network requests besides loading its own assets.
+- **Any standard PDF encryption**: RC4 40/128-bit, AES-128 and AES-256. Either the user (open) password or the owner password works.
+- **Restrictions too.** If a PDF opens without a password but blocks printing, copying or editing, pick·pdf removes those limits straight away without asking.
+- Up to 200 MB. The output is saved as `<name>-unlocked.pdf`, and can be handed straight to the share flow below.
+
+It only removes passwords you already know. It does not guess or crack them.
+
+## Share a file (`/share`)
+
+The first person to unlock the link gets the file, and then it's deleted.
 
 - **End-to-end encrypted.** Files are encrypted in the browser (AES-256-GCM, key from PBKDF2-SHA256 with 600k iterations). The server never sees the password, the file name or the contents.
 - **Burn after reading.** A successful unlock deletes the file. Five wrong passwords also delete it, and so does the expiry you pick (1 hour, 1 day or 7 days).
@@ -8,7 +21,7 @@ Share a file behind a password. The first person to unlock it gets the file, and
 
 Runs on Cloudflare Workers with R2 for the encrypted blobs and SQLite-backed Durable Objects for metadata.
 
-## How it works
+## How sharing works
 
 ```
 browser                                     worker                 storage

@@ -6,5 +6,6 @@
     "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "types": ["vite/client"]
   },
-  "include": ["src/client", "src/shared"]
+  "include": ["src/client", "src/shared"],
+  "exclude": ["src/client/pdf/unlock.worker.ts"]
 }

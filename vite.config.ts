@@ -15,6 +15,9 @@ export default defineConfig({
         }),
       ],
 
+  // The PDF unlocker runs qpdf in a module Web Worker.
+  worker: { format: "es" },
+
   fmt: {
     printWidth: 100,
     ignorePatterns: ["dist/**", "worker-configuration.d.ts", "pnpm-lock.yaml"],

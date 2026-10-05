@@ -8,10 +8,28 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*"],
   },
-  "r2_buckets": [{ "binding": "FILES", "bucket_name": "pick-pdf-files" }],
+  "r2_buckets": [
+    {
+      "binding": "FILES",
+      "bucket_name": "pick-pdf-files",
+    },
+  ],
   "durable_objects": {
-    "bindings": [{ "name": "VAULT", "class_name": "FileVault" }],
+    "bindings": [
+      {
+        "name": "VAULT",
+        "class_name": "FileVault",
+      },
+    ],
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["FileVault"] }],
-  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["FileVault"],
+    },
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
 }

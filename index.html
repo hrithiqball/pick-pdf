@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Share a file behind a password. It burns after the first unlock."
+      content="Remove the password from a PDF, right in your browser. Your file never leaves your device."
     />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -21,15 +21,95 @@
     <div class="shell">
       <header class="masthead">
         <a class="brand" href="/" aria-label="pick·pdf home">pick<span>·</span>pdf</a>
-        <p class="tagline">One password. One download. Then it's gone.</p>
+        <nav class="nav" aria-label="Main">
+          <a href="/" id="nav-unlock">Unlock PDF</a>
+          <a href="/share" id="nav-share">Share a file</a>
+        </nav>
       </header>
 
       <main>
         <noscript
           ><p class="card">
-            pick·pdf encrypts files in your browser, so it needs JavaScript.
+            pick·pdf works on your files inside your browser, so it needs JavaScript.
           </p></noscript
         >
+        <!-- Unlock: pick a PDF, then a password if it needs one -->
+        <section id="view-unlock" class="card" aria-labelledby="unlock-title" hidden>
+          <h1 id="unlock-title" class="title" tabindex="-1">Unlock a PDF</h1>
+          <p class="lede">
+            Remove the password from a PDF you're allowed to open. It's done in your browser, so the
+            file and password never leave your device.
+          </p>
+
+          <div class="dropzone" id="pdf-dropzone">
+            <input
+              id="pdf-input"
+              class="visually-hidden"
+              type="file"
+              name="pdf"
+              accept="application/pdf,.pdf"
+            />
+            <label for="pdf-input" class="dropzone-label" id="pdf-dropzone-label">
+              <span class="dropzone-icon" aria-hidden="true">⚿</span>
+              <span class="dropzone-text"><strong>Choose a PDF</strong> or drop it here</span>
+              <span class="dropzone-hint mono" id="pdf-limit-hint"></span>
+            </label>
+            <div class="file-chip" id="pdf-chip" hidden>
+              <span class="file-chip-icon" aria-hidden="true">▤</span>
+              <span class="file-chip-meta">
+                <span class="file-chip-name" id="pdf-name"></span>
+                <span class="file-chip-size mono" id="pdf-size"></span>
+              </span>
+              <button type="button" class="link-button" id="pdf-clear">
+                Remove<span class="visually-hidden"> selected PDF</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="status" id="pdf-status" aria-live="polite"></p>
+          <p class="error" id="pdf-error" role="alert"></p>
+
+          <form id="pdf-form" novalidate hidden>
+            <div class="field">
+              <label for="pdf-password">PDF password</label>
+              <div class="password-wrap">
+                <input
+                  id="pdf-password"
+                  name="password"
+                  type="password"
+                  autocomplete="off"
+                  required
+                />
+                <button
+                  type="button"
+                  class="reveal"
+                  data-reveal="pdf-password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+            </div>
+            <button type="submit" class="primary" id="pdf-submit">Unlock PDF</button>
+          </form>
+        </section>
+
+        <!-- Unlocked -->
+        <section id="view-unlocked" class="card" aria-labelledby="unlocked-title" hidden>
+          <p class="stamp" aria-hidden="true">Unlocked</p>
+          <h1 id="unlocked-title" class="title" tabindex="-1">Password removed</h1>
+          <p class="lede" id="unlocked-lede">
+            <strong id="unlocked-name"></strong><span id="unlocked-detail"></span>
+          </p>
+          <a class="primary as-button" id="unlocked-save" href="#" download
+            >Download unlocked PDF</a
+          >
+          <button type="button" class="secondary as-button" id="unlocked-share">
+            Share it with a one-time link
+          </button>
+          <a class="secondary as-button" href="/">Unlock another PDF</a>
+        </section>
+
         <!-- Upload -->
         <section id="view-upload" class="card" aria-labelledby="upload-title" hidden>
           <h1 id="upload-title" class="title">Seal a file</h1>
@@ -148,7 +228,7 @@
               <dd id="shared-expiry"></dd>
             </div>
           </dl>
-          <a class="secondary as-button" href="/" id="upload-another">Seal another file</a>
+          <a class="secondary as-button" href="/share" id="upload-another">Seal another file</a>
         </section>
 
         <!-- Open -->
@@ -207,7 +287,7 @@
             download didn't start, save it now. This page is the only copy left.
           </p>
           <a class="primary as-button" id="done-save" href="#" download>Save file</a>
-          <a class="secondary as-button" href="/">Seal a file of your own</a>
+          <a class="secondary as-button" href="/share">Seal a file of your own</a>
         </section>
 
         <!-- Gone -->
@@ -217,11 +297,11 @@
           <p class="lede" id="gone-reason">
             This file was already opened, expired, or never existed.
           </p>
-          <a class="primary as-button" href="/">Seal a file</a>
+          <a class="primary as-button" href="/share">Seal a file</a>
         </section>
       </main>
 
-      <footer class="footer mono">AES-256-GCM · PBKDF2-SHA256 · 5 attempts, then it burns</footer>
+      <footer class="footer mono">Runs in your browser · powered by qpdf</footer>
     </div>
     <script type="module" src="/src/client/main.ts"></script>
   </body>
