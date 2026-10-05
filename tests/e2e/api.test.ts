@@ -1,3 +1,4 @@
+import { request } from "node:http";
 import { describe, expect, it } from "vite-plus/test";
 import {
   HEADER_AUTH_HASH,
@@ -13,6 +14,22 @@ const authHash = toB64url(new Uint8Array(32));
 
 function upload(headers: Record<string, string>, body: BodyInit = "ciphertext") {
   return fetch(`${baseURL}/api/files`, { method: "POST", headers, body });
+}
+
+function declareOversizedUpload(headers: Record<string, string>, length: number) {
+  return new Promise<number>((resolve, reject) => {
+    const req = request(
+      `${baseURL}/api/files`,
+      { method: "POST", headers: { ...headers, "content-length": String(length) } },
+      (res) => {
+        resolve(res.statusCode ?? 0);
+        res.resume();
+        req.destroy();
+      },
+    );
+    req.on("error", reject);
+    req.write(Buffer.alloc(64 * 1024));
+  });
 }
 
 function claim(id: string, authKey: string) {
@@ -42,8 +59,9 @@ describe("API", () => {
   it("rejects empty and oversized uploads", async () => {
     const headers = { [HEADER_SALT]: salt, [HEADER_AUTH_HASH]: authHash, [HEADER_EXPIRY]: "1h" };
     expect((await upload(headers, "")).status).toBe(411);
-    const tooBig = await upload(headers, new Uint8Array(MAX_UPLOAD_BYTES + 1));
-    expect(tooBig.status).toBe(413);
+    // Declare an oversized body but only send a sliver of it: the Worker must reject on
+    // the header alone, before reading (or paying for) the upload.
+    expect(await declareOversizedUpload(headers, MAX_UPLOAD_BYTES + 1)).toBe(413);
   });
 
   it("returns 404 for unknown or malformed ids", async () => {

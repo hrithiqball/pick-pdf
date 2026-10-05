@@ -19,3 +19,8 @@ jobs:
       - run: vp check
       # e2e tests build the app and run it in workerd via `vp preview`
       - run: vp test
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/

@@ -9,7 +9,7 @@ import {
   MAX_UPLOAD_BYTES,
   randomId,
 } from "../shared/protocol.ts";
-import type { UploadResult } from "../shared/protocol.ts";
+import type { ExpiryOption, UploadResult } from "../shared/protocol.ts";
 
 export { FileVault } from "./vault.ts";
 
@@ -57,6 +57,38 @@ async function route(request: Request, env: Env, ctx: ExecutionContext): Promise
 }
 
 async function upload(request: Request, env: Env): Promise<Response> {
+  const parsed = parseUpload(request);
+  if (parsed instanceof Response) {
+    // Tell the runtime we won't read the body so the client isn't left streaming into a void.
+    await request.body?.cancel();
+    return parsed;
+  }
+  const { body, salt, authHash, expiry, length } = parsed;
+
+  const id = randomId();
+  const expiresAt = Date.now() + EXPIRY_OPTIONS[expiry] * 1000;
+  await env.FILES.put(id, body);
+
+  try {
+    await vault(env, id).create({ r2Key: id, salt, authHash, size: length, expiresAt });
+  } catch (error) {
+    await env.FILES.delete(id);
+    throw error;
+  }
+
+  console.log(JSON.stringify({ message: "file uploaded", size: length, expiry }));
+  return json({ id, expiresAt } satisfies UploadResult, 201);
+}
+
+interface UploadParams {
+  body: ReadableStream;
+  salt: string;
+  authHash: string;
+  expiry: ExpiryOption;
+  length: number;
+}
+
+function parseUpload(request: Request): UploadParams | Response {
   const salt = request.headers.get(HEADER_SALT);
   const authHash = request.headers.get(HEADER_AUTH_HASH);
   const expiry = request.headers.get(HEADER_EXPIRY);
@@ -69,20 +101,7 @@ async function upload(request: Request, env: Env): Promise<Response> {
     return json({ error: "length_required" }, 411);
   }
   if (length > MAX_UPLOAD_BYTES) return json({ error: "too_large" }, 413);
-
-  const id = randomId();
-  const expiresAt = Date.now() + EXPIRY_OPTIONS[expiry] * 1000;
-  await env.FILES.put(id, request.body);
-
-  try {
-    await vault(env, id).create({ r2Key: id, salt, authHash, size: length, expiresAt });
-  } catch (error) {
-    await env.FILES.delete(id);
-    throw error;
-  }
-
-  console.log(JSON.stringify({ message: "file uploaded", size: length, expiry }));
-  return json({ id, expiresAt } satisfies UploadResult, 201);
+  return { body: request.body, salt, authHash, expiry, length };
 }
 
 async function info(env: Env, id: string): Promise<Response> {

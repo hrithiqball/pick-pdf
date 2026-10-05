@@ -2,7 +2,7 @@
 // `vp preview`, so the e2e suite exercises exactly what gets deployed.
 import { spawn, spawnSync } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -79,6 +79,9 @@ export default async function setup(project: TestProject): Promise<() => void> {
   project.provide("baseURL", baseURL);
 
   return () => {
+    // Keep the server log around; CI uploads it as an artifact when tests fail.
+    mkdirSync(join(root, "test-results"), { recursive: true });
+    writeFileSync(join(root, "test-results/preview.log"), log);
     if (child.pid) process.kill(-child.pid, "SIGTERM");
     rmSync(persistDir, { recursive: true, force: true });
   };
