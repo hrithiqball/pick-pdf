@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Share a file behind a password. It burns after the first unlock."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Inter+Tight:wght@400;500;600&display=swap"
+    />
+    <title>pick·pdf</title>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="masthead">
+        <a class="brand" href="/" aria-label="pick·pdf home">pick<span>·</span>pdf</a>
+        <p class="tagline">One password. One download. Then it's gone.</p>
+      </header>
+
+      <main>
+        <noscript
+          ><p class="card">
+            pick·pdf encrypts files in your browser, so it needs JavaScript.
+          </p></noscript
+        >
+        <!-- Upload -->
+        <section id="view-upload" class="card" aria-labelledby="upload-title" hidden>
+          <h1 id="upload-title" class="title">Seal a file</h1>
+          <p class="lede">
+            Encrypted in your browser before it leaves. We never see the password or the contents.
+          </p>
+
+          <form id="upload-form" novalidate>
+            <div class="dropzone" id="dropzone">
+              <input id="file-input" class="visually-hidden" type="file" name="file" />
+              <label for="file-input" class="dropzone-label" id="dropzone-label">
+                <span class="dropzone-icon" aria-hidden="true">↥</span>
+                <span class="dropzone-text"><strong>Choose a file</strong> or drop it here</span>
+                <span class="dropzone-hint mono" id="file-limit-hint"></span>
+              </label>
+              <div class="file-chip" id="file-chip" hidden>
+                <span class="file-chip-icon" aria-hidden="true">▤</span>
+                <span class="file-chip-meta">
+                  <span class="file-chip-name" id="file-name"></span>
+                  <span class="file-chip-size mono" id="file-size"></span>
+                </span>
+                <button type="button" class="link-button" id="file-clear">
+                  Remove<span class="visually-hidden"> selected file</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="password">Password</label>
+              <div class="password-wrap">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  aria-describedby="password-hint"
+                  required
+                />
+                <button
+                  type="button"
+                  class="reveal"
+                  data-reveal="password confirm"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+              <p class="hint" id="password-hint"></p>
+            </div>
+
+            <div class="field">
+              <label for="confirm">Confirm password</label>
+              <input
+                id="confirm"
+                name="confirm"
+                type="password"
+                autocomplete="new-password"
+                required
+              />
+            </div>
+
+            <fieldset class="field segmented">
+              <legend>Self-destructs if unopened after</legend>
+              <div class="segments">
+                <label><input type="radio" name="expiry" value="1h" /><span>1 hour</span></label>
+                <label
+                  ><input type="radio" name="expiry" value="1d" checked /><span>1 day</span></label
+                >
+                <label><input type="radio" name="expiry" value="7d" /><span>7 days</span></label>
+              </div>
+            </fieldset>
+
+            <p class="error" id="upload-error" role="alert"></p>
+
+            <button type="submit" class="primary" id="upload-submit">Encrypt &amp; upload</button>
+          </form>
+
+          <div class="progress" id="upload-progress" hidden>
+            <p class="progress-label" id="progress-label" aria-live="polite">Encrypting…</p>
+            <div
+              class="progress-track"
+              role="progressbar"
+              aria-labelledby="progress-label"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              id="progress-bar"
+            >
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Shared -->
+        <section id="view-shared" class="card" aria-labelledby="shared-title" hidden>
+          <p class="stamp" aria-hidden="true">Sealed</p>
+          <h1 id="shared-title" class="title" tabindex="-1">Your link is ready</h1>
+          <p class="lede">
+            Send the link and the password through <em>different</em> channels. The first person to
+            unlock it gets the file. After that it's deleted.
+          </p>
+          <div class="field">
+            <label for="share-link">Share link</label>
+            <div class="copy-row">
+              <input id="share-link" type="text" readonly class="mono" />
+              <button type="button" class="secondary" id="copy-link">Copy</button>
+            </div>
+            <p class="hint" id="copy-status" aria-live="polite"></p>
+          </div>
+          <dl class="facts">
+            <div>
+              <dt>File</dt>
+              <dd id="shared-name"></dd>
+            </div>
+            <div>
+              <dt>Expires</dt>
+              <dd id="shared-expiry"></dd>
+            </div>
+          </dl>
+          <a class="secondary as-button" href="/" id="upload-another">Seal another file</a>
+        </section>
+
+        <!-- Open -->
+        <section id="view-open" class="card" aria-labelledby="open-title" hidden>
+          <h1 id="open-title" class="title">Someone sealed a file for you</h1>
+          <p class="lede">
+            Enter the password to decrypt it. This works <strong>once</strong>. The file is deleted
+            from the server as soon as it unlocks.
+          </p>
+          <dl class="facts">
+            <div>
+              <dt>Size</dt>
+              <dd id="open-size"></dd>
+            </div>
+            <div>
+              <dt>Expires</dt>
+              <dd id="open-expiry"></dd>
+            </div>
+            <div>
+              <dt>Attempts left</dt>
+              <dd id="open-attempts"></dd>
+            </div>
+          </dl>
+          <form id="open-form" novalidate>
+            <div class="field">
+              <label for="open-password">Password</label>
+              <div class="password-wrap">
+                <input
+                  id="open-password"
+                  name="password"
+                  type="password"
+                  autocomplete="off"
+                  required
+                />
+                <button
+                  type="button"
+                  class="reveal"
+                  data-reveal="open-password"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+            </div>
+            <p class="error" id="open-error" role="alert"></p>
+            <button type="submit" class="primary" id="open-submit">Unlock &amp; download</button>
+          </form>
+        </section>
+
+        <!-- Done -->
+        <section id="view-done" class="card" aria-labelledby="done-title" hidden>
+          <p class="stamp burnt" aria-hidden="true">Burnt</p>
+          <h1 id="done-title" class="title" tabindex="-1">Unlocked</h1>
+          <p class="lede">
+            <strong id="done-name"></strong> has been decrypted and the server copy is gone. If the
+            download didn't start, save it now. This page is the only copy left.
+          </p>
+          <a class="primary as-button" id="done-save" href="#" download>Save file</a>
+          <a class="secondary as-button" href="/">Seal a file of your own</a>
+        </section>
+
+        <!-- Gone -->
+        <section id="view-gone" class="card" aria-labelledby="gone-title" hidden>
+          <p class="stamp burnt" aria-hidden="true">Gone</p>
+          <h1 id="gone-title" class="title" tabindex="-1">Nothing here</h1>
+          <p class="lede" id="gone-reason">
+            This file was already opened, expired, or never existed.
+          </p>
+          <a class="primary as-button" href="/">Seal a file</a>
+        </section>
+      </main>
+
+      <footer class="footer mono">AES-256-GCM · PBKDF2-SHA256 · 5 attempts, then it burns</footer>
+    </div>
+    <script type="module" src="/src/client/main.ts"></script>
+  </body>
+</html>

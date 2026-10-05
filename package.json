@@ -1,0 +1,23 @@
+{
+  "name": "pick-pdf",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Password-protected, burn-after-reading file drop on Cloudflare Workers",
+  "type": "module",
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.62.5",
+    "@types/node": "^24.0.0",
+    "playwright": "^1.63.0",
+    "typescript": "~6.0.2",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "wrangler": "^4.147.0"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.9.1",
+      "onFail": "download"
+    }
+  }
+}
