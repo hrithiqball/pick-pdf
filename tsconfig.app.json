@@ -7,5 +7,5 @@
     "types": ["vite/client"]
   },
   "include": ["src/client", "src/shared"],
-  "exclude": ["src/client/pdf/unlock.worker.ts"]
+  "exclude": ["src/client/pdf/pdf.worker.ts"]
 }

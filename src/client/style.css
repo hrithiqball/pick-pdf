@@ -373,6 +373,45 @@ input[aria-invalid="true"] {
   padding: 0;
 }
 
+.check {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 4px 0 18px;
+  cursor: pointer;
+  font-size: 0.94rem;
+}
+
+.check input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  accent-color: var(--ink);
+}
+
+.check input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.check-note {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.84rem;
+}
+
+.note {
+  margin: 0 0 18px;
+  color: var(--ink-2);
+  font-size: 0.86rem;
+}
+
+.status a {
+  color: inherit;
+  font-weight: 600;
+}
+
 legend {
   padding: 0;
   margin-bottom: 6px;

@@ -112,13 +112,24 @@ const wasmPath = new URL(
 export const fixturePath = (name: string) =>
   new URL(`../fixtures/${name}.pdf`, import.meta.url).pathname;
 
-/** Inspect a downloaded PDF with qpdf in Node: is it still encrypted, and what text does it hold? */
-export async function inspectPdf(pdf: Uint8Array): Promise<{ encrypted: boolean; text: string }> {
+/**
+ * Inspect a downloaded PDF with qpdf in Node: is it encrypted, what's its encryption setup
+ * (when `password` opens it), and what text does it hold?
+ */
+export async function inspectPdf(
+  pdf: Uint8Array,
+  password = "",
+): Promise<{ encrypted: boolean; encryption: string; text: string }> {
   const locate = () => wasmPath;
-  const encrypted = (await runQpdf(["--is-encrypted", INPUT], pdf, locate)).exitCode === 0;
-  const qdf = await runQpdf(["--qdf", "--object-streams=disable", INPUT, OUTPUT], pdf, locate);
+  const pw = `--password=${password}`;
+  const check = await runQpdf([pw, "--is-encrypted", INPUT], pdf, locate);
+  // A PDF that needs a password we didn't supply fails with "invalid password".
+  const encrypted = check.exitCode === 0 || /invalid password/.test(check.output);
+  const encryption = (await runQpdf([pw, "--show-encryption", INPUT], pdf, locate)).output;
+  const qdf = await runQpdf([pw, "--qdf", "--object-streams=disable", INPUT, OUTPUT], pdf, locate);
   return {
     encrypted,
+    encryption,
     text: new TextDecoder("latin1").decode(qdf.readOutput() ?? new Uint8Array()),
   };
 }

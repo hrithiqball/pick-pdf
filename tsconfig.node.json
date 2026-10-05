@@ -12,7 +12,7 @@
     "src/shared",
     "src/client/format.ts",
     "src/client/pdf/qpdf.ts",
-    "src/client/pdf/unlock-client.ts",
+    "src/client/pdf/client.ts",
     "src/client/pdf/protocol.ts"
   ]
 }

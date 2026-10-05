@@ -1,5 +1,6 @@
 import "./style.css";
 import { openLink, showGone, showShare } from "./share.ts";
+import { showLock } from "./lock.ts";
 import { showUnlock } from "./unlock.ts";
 import { isFileId } from "../shared/protocol.ts";
 
@@ -11,12 +12,17 @@ if (path === "/f" || path.startsWith("/f/")) {
   else showGone();
 } else if (path === "/share") {
   showShare();
+} else if (path === "/lock") {
+  showLock(shareFile);
 } else {
-  showUnlock((file) => {
-    history.pushState(null, "", "/share");
-    showShare(file);
-  });
+  showUnlock(shareFile);
 }
 
-// Back from the share hand-off returns to the unlocker.
+/** Hand a freshly locked/unlocked PDF to the one-time share flow. */
+function shareFile(file: File): void {
+  history.pushState(null, "", "/share");
+  showShare(file);
+}
+
+// Back from the share hand-off returns to the page it came from.
 addEventListener("popstate", () => location.reload());

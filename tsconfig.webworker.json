@@ -7,7 +7,7 @@
     "types": ["vite/client"]
   },
   "include": [
-    "src/client/pdf/unlock.worker.ts",
+    "src/client/pdf/pdf.worker.ts",
     "src/client/pdf/qpdf.ts",
     "src/client/pdf/protocol.ts"
   ]

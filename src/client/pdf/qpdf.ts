@@ -103,6 +103,73 @@ export async function unlockPdf(
   return { kind: "unlocked", pdf, restrictionsOnly: password === "" };
 }
 
+export type PdfStatus =
+  /** Opens without a password (may still carry print/copy/edit restrictions). */
+  | { kind: "open"; restricted: boolean }
+  | { kind: "needs_password" }
+  | { kind: "invalid_pdf"; detail: string };
+
+/** What protection a PDF has, without decrypting or writing anything. */
+export async function inspectPdf(input: Uint8Array, locateWasm: () => string): Promise<PdfStatus> {
+  // --is-encrypted exits 0 when encrypted, 2 when not; it also fails (2, with a message)
+  // when the file can't be opened at all.
+  const run = await runQpdf(["--is-encrypted", INPUT], input, locateWasm);
+  if (run.exitCode === 0) return { kind: "open", restricted: true };
+  if (/invalid password/i.test(run.output)) return { kind: "needs_password" };
+  if (run.output.trim()) return { kind: "invalid_pdf", detail: lastLine(run.output) };
+  return { kind: "open", restricted: false };
+}
+
+export interface LockOptions {
+  password: string;
+  /** Also block printing, copying and editing (behind a random owner password). */
+  restrict: boolean;
+}
+
+export type LockOutcome =
+  | { kind: "locked"; pdf: Uint8Array<ArrayBuffer> }
+  | { kind: "needs_password" }
+  | { kind: "invalid_pdf"; detail: string };
+
+/** Encrypt with AES-256. Any existing restrictions on an openable PDF are replaced. */
+export async function lockPdf(
+  input: Uint8Array,
+  { password, restrict }: LockOptions,
+  locateWasm: () => string,
+): Promise<LockOutcome> {
+  // With restrictions, the owner password must differ from the user password or opening
+  // with the user password would grant full access. Nobody needs to know it.
+  const owner = restrict ? randomOwnerPassword() : password;
+  const limits = restrict ? ["--print=none", "--modify=none", "--extract=n", "--annotate=n"] : [];
+  const run = await runQpdf(
+    [
+      "--encrypt",
+      `--user-password=${password}`,
+      `--owner-password=${owner}`,
+      "--bits=256",
+      ...limits,
+      "--",
+      INPUT,
+      OUTPUT,
+    ],
+    input,
+    locateWasm,
+  );
+
+  if (!succeeded(run.exitCode)) {
+    if (/invalid password/i.test(run.output)) return { kind: "needs_password" };
+    return { kind: "invalid_pdf", detail: lastLine(run.output) };
+  }
+  const pdf = run.readOutput();
+  if (!pdf) return { kind: "invalid_pdf", detail: "qpdf produced no output" };
+  return { kind: "locked", pdf };
+}
+
+function randomOwnerPassword(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 function lastLine(text: string): string {
   return text.trim().split("\n").at(-1) ?? "unknown error";
 }

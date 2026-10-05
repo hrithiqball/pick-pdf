@@ -1,7 +1,14 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vite-plus/test";
-import { INPUT, OUTPUT, runQpdf, unlockPdf } from "../../src/client/pdf/qpdf.ts";
-import { looksLikePdf, unlockedName } from "../../src/client/pdf/unlock-client.ts";
+import {
+  INPUT,
+  inspectPdf,
+  lockPdf,
+  OUTPUT,
+  runQpdf,
+  unlockPdf,
+} from "../../src/client/pdf/qpdf.ts";
+import { looksLikePdf, renamePdf } from "../../src/client/pdf/client.ts";
 
 const wasmPath = new URL(
   "../../node_modules/@neslinesli93/qpdf-wasm/dist/qpdf.wasm",
@@ -120,12 +127,106 @@ describe("unlockPdf", () => {
   });
 });
 
+describe("inspectPdf", () => {
+  it("tells open, restricted, locked and damaged PDFs apart", async () => {
+    expect(await inspectPdf(fixture("plain"), wasm)).toEqual({ kind: "open", restricted: false });
+    expect(await inspectPdf(fixture("restricted"), wasm)).toEqual({
+      kind: "open",
+      restricted: true,
+    });
+    for (const name of PASSWORD_PROTECTED) {
+      expect(await inspectPdf(fixture(name), wasm)).toEqual({ kind: "needs_password" });
+    }
+    expect((await inspectPdf(fixture("corrupt"), wasm)).kind).toBe("invalid_pdf");
+  });
+});
+
+/** qpdf --show-encryption output for `pdf` opened with `password`. */
+async function encryption(pdf: Uint8Array, password: string): Promise<string> {
+  return (await runQpdf([`--password=${password}`, "--show-encryption", INPUT], pdf, wasm)).output;
+}
+
+describe("lockPdf", () => {
+  it("adds an AES-256 open password and keeps the content", async () => {
+    const outcome = await lockPdf(
+      fixture("plain"),
+      { password: "hunter22", restrict: false },
+      wasm,
+    );
+    expect(outcome.kind).toBe("locked");
+    if (outcome.kind !== "locked") return;
+
+    expect(await inspectPdf(outcome.pdf, wasm)).toEqual({ kind: "needs_password" });
+    const info = await encryption(outcome.pdf, "hunter22");
+    expect(info).toContain("R = 6");
+    expect(info).toContain("AESv3");
+    // Without restrictions the password grants full access.
+    expect(info).toContain("print high resolution: allowed");
+    expect(info).toContain("modify anything: allowed");
+
+    // Round trip: our own unlocker opens it again.
+    expect((await unlockPdf(outcome.pdf, "wrong", wasm)).kind).toBe("needs_password");
+    const unlocked = await unlockPdf(outcome.pdf, "hunter22", wasm);
+    expect(unlocked.kind).toBe("unlocked");
+    if (unlocked.kind === "unlocked") {
+      expect(await pageText(unlocked.pdf)).toContain("Hello from pick-pdf");
+    }
+  });
+
+  it("can also block printing, copying and editing", async () => {
+    const outcome = await lockPdf(fixture("plain"), { password: "hunter22", restrict: true }, wasm);
+    expect(outcome.kind).toBe("locked");
+    if (outcome.kind !== "locked") return;
+    const info = await encryption(outcome.pdf, "hunter22");
+    // The user password must not double as the owner password, or the limits would be moot.
+    expect(info).toContain("Supplied password is user password");
+    expect(info).not.toContain("Supplied password is owner password");
+    expect(info).toContain("print high resolution: not allowed");
+    expect(info).toContain("extract for any purpose: not allowed");
+    expect(info).toContain("modify anything: not allowed");
+  });
+
+  it("handles unicode passwords", async () => {
+    const outcome = await lockPdf(
+      fixture("plain"),
+      { password: "pässwörd 密码 🔒", restrict: false },
+      wasm,
+    );
+    expect(outcome.kind).toBe("locked");
+    if (outcome.kind !== "locked") return;
+    expect((await unlockPdf(outcome.pdf, "pässwörd 密码 🔒", wasm)).kind).toBe("unlocked");
+    expect((await unlockPdf(outcome.pdf, "passwort", wasm)).kind).toBe("needs_password");
+  });
+
+  it("replaces print/copy restrictions on a PDF that opens without a password", async () => {
+    const outcome = await lockPdf(
+      fixture("restricted"),
+      { password: "hunter22", restrict: false },
+      wasm,
+    );
+    expect(outcome.kind).toBe("locked");
+    if (outcome.kind !== "locked") return;
+    expect(await encryption(outcome.pdf, "hunter22")).toContain("print high resolution: allowed");
+  });
+
+  it("refuses PDFs that already need a password, and damaged files", async () => {
+    expect(
+      await lockPdf(fixture("aes256"), { password: "hunter22", restrict: false }, wasm),
+    ).toEqual({
+      kind: "needs_password",
+    });
+    expect(
+      (await lockPdf(fixture("corrupt"), { password: "hunter22", restrict: false }, wasm)).kind,
+    ).toBe("invalid_pdf");
+  });
+});
+
 describe("helpers", () => {
-  it("names the unlocked copy", () => {
-    expect(unlockedName("report.pdf")).toBe("report-unlocked.pdf");
-    expect(unlockedName("Report.PDF")).toBe("Report-unlocked.pdf");
-    expect(unlockedName("archive")).toBe("archive-unlocked.pdf");
-    expect(unlockedName(".pdf")).toBe("document-unlocked.pdf");
+  it("names the output copy", () => {
+    expect(renamePdf("report.pdf", "unlocked")).toBe("report-unlocked.pdf");
+    expect(renamePdf("Report.PDF", "locked")).toBe("Report-locked.pdf");
+    expect(renamePdf("archive", "unlocked")).toBe("archive-unlocked.pdf");
+    expect(renamePdf(".pdf", "locked")).toBe("document-locked.pdf");
   });
 
   it("sniffs the PDF header", () => {

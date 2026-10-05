@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Remove the password from a PDF, right in your browser. Your file never leaves your device."
+      content="Add or remove a PDF password, right in your browser. Your file never leaves your device."
     />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -23,6 +23,7 @@
         <a class="brand" href="/" aria-label="pick·pdf home">pick<span>·</span>pdf</a>
         <nav class="nav" aria-label="Main">
           <a href="/" id="nav-unlock">Unlock PDF</a>
+          <a href="/lock" id="nav-lock">Lock PDF</a>
           <a href="/share" id="nav-share">Share a file</a>
         </nav>
       </header>
@@ -108,6 +109,113 @@
             Share it with a one-time link
           </button>
           <a class="secondary as-button" href="/">Unlock another PDF</a>
+        </section>
+
+        <!-- Lock: pick a PDF, choose a password -->
+        <section id="view-lock" class="card" aria-labelledby="lock-title" hidden>
+          <h1 id="lock-title" class="title" tabindex="-1">Lock a PDF</h1>
+          <p class="lede">
+            Add a password that's needed to open the PDF. It's encrypted in your browser with
+            AES-256, so the file and password never leave your device.
+          </p>
+
+          <div class="dropzone" id="lock-dropzone">
+            <input
+              id="lock-input"
+              class="visually-hidden"
+              type="file"
+              name="pdf"
+              accept="application/pdf,.pdf"
+            />
+            <label for="lock-input" class="dropzone-label" id="lock-dropzone-label">
+              <span class="dropzone-icon" aria-hidden="true">⚿</span>
+              <span class="dropzone-text"><strong>Choose a PDF</strong> or drop it here</span>
+              <span class="dropzone-hint mono" id="lock-limit-hint"></span>
+            </label>
+            <div class="file-chip" id="lock-chip" hidden>
+              <span class="file-chip-icon" aria-hidden="true">▤</span>
+              <span class="file-chip-meta">
+                <span class="file-chip-name" id="lock-name"></span>
+                <span class="file-chip-size mono" id="lock-size"></span>
+              </span>
+              <button type="button" class="link-button" id="lock-clear">
+                Remove<span class="visually-hidden"> selected PDF</span>
+              </button>
+            </div>
+          </div>
+
+          <p class="status" id="lock-status" aria-live="polite"></p>
+          <p class="error" id="lock-error" role="alert"></p>
+          <p class="status" id="lock-already" hidden>
+            This PDF already has a password. <a href="/">Unlock it first</a>, then lock it again
+            with a new one.
+          </p>
+
+          <form id="lock-form" novalidate hidden>
+            <div class="field">
+              <label for="lock-password">New password</label>
+              <div class="password-wrap">
+                <input
+                  id="lock-password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  aria-describedby="lock-password-hint"
+                  required
+                />
+                <button
+                  type="button"
+                  class="reveal"
+                  data-reveal="lock-password lock-confirm"
+                  aria-pressed="false"
+                >
+                  Show
+                </button>
+              </div>
+              <p class="hint" id="lock-password-hint"></p>
+            </div>
+
+            <div class="field">
+              <label for="lock-confirm">Confirm password</label>
+              <input
+                id="lock-confirm"
+                name="confirm"
+                type="password"
+                autocomplete="new-password"
+                required
+              />
+            </div>
+
+            <label class="check">
+              <input type="checkbox" name="restrict" id="lock-restrict" />
+              <span>
+                Also block printing, copying and editing
+                <span class="check-note">Most PDF viewers respect this, but not all.</span>
+              </span>
+            </label>
+
+            <p class="note">
+              There's no way to recover a forgotten password. Keep it somewhere safe.
+            </p>
+
+            <button type="submit" class="primary" id="lock-submit">Lock PDF</button>
+          </form>
+        </section>
+
+        <!-- Locked -->
+        <section id="view-locked" class="card" aria-labelledby="locked-title" hidden>
+          <p class="stamp" aria-hidden="true">Locked</p>
+          <h1 id="locked-title" class="title" tabindex="-1">PDF locked</h1>
+          <p class="lede">
+            <strong id="locked-name"></strong> now needs the password to open.<span
+              id="locked-detail"
+            ></span>
+          </p>
+          <a class="primary as-button" id="locked-save" href="#" download>Download locked PDF</a>
+          <button type="button" class="secondary as-button" id="locked-share">
+            Share it with a one-time link
+          </button>
+          <a class="secondary as-button" href="/lock">Lock another PDF</a>
         </section>
 
         <!-- Upload -->

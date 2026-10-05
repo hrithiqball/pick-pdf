@@ -1,6 +1,6 @@
 // "Share a file": encrypt in the browser, upload, and hand out a one-time link.
 import { ApiError, claimFile, getFileInfo, uploadFile } from "./api.ts";
-import { $, bindDropzone, show } from "./dom.ts";
+import { $, bindDropzone, bindPasswordHint, show } from "./dom.ts";
 import { checkPasswords, formatBytes, formatRelative } from "./format.ts";
 import { decryptFile, deriveKeys, encryptFile, SALT_BYTES } from "../shared/crypto.ts";
 import {
@@ -63,25 +63,7 @@ $("file-clear").addEventListener("click", () => {
 
 bindDropzone(dropzone, selectFile);
 
-function updatePasswordHint(): void {
-  const password = passwordInput.value;
-  const confirm = confirmInput.value;
-  passwordHint.classList.remove("ok");
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    passwordHint.textContent = `At least ${MIN_PASSWORD_LENGTH} characters.`;
-  } else if (confirm && confirm !== password) {
-    passwordHint.textContent = "Passwords don't match yet.";
-  } else if (confirm === password) {
-    passwordHint.textContent = "Passwords match.";
-    passwordHint.classList.add("ok");
-  } else {
-    passwordHint.textContent = "Now confirm it below.";
-  }
-  passwordInput.removeAttribute("aria-invalid");
-  confirmInput.removeAttribute("aria-invalid");
-}
-passwordInput.addEventListener("input", updatePasswordHint);
-confirmInput.addEventListener("input", updatePasswordHint);
+const updatePasswordHint = bindPasswordHint(passwordInput, confirmInput, passwordHint);
 
 function setProgress(label: string, fraction: number | null): void {
   progressLabel.textContent = label;

@@ -1,6 +1,6 @@
 # pick·pdf
 
-Remove the password from a PDF, right in your browser. There's also a one-time link for sharing a file, which is deleted after the first download.
+Add or remove a PDF password, right in your browser. There's also a one-time link for sharing a file, which is deleted after the first download.
 
 ## Unlock a PDF (home page)
 
@@ -10,6 +10,13 @@ Remove the password from a PDF, right in your browser. There's also a one-time l
 - Up to 200 MB. The output is saved as `<name>-unlocked.pdf`, and can be handed straight to the share flow below.
 
 It only removes passwords you already know. It does not guess or crack them.
+
+## Lock a PDF (`/lock`)
+
+- Adds an open password with **AES-256** (PDF 2.0 / R6), again entirely in the browser with qpdf. Unicode passwords work.
+- Optionally **blocks printing, copying and editing**. These limits sit behind a random owner password that nobody is told, so the user password can't lift them. Viewers enforce such limits voluntarily, and most do.
+- A PDF that already needs a password is sent to Unlock first. A PDF with restrictions but no open password gets those restrictions replaced.
+- The output is saved as `<name>-locked.pdf`, and can be handed to the share flow too.
 
 ## Share a file (`/share`)
 

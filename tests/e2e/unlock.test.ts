@@ -29,9 +29,9 @@ describe("unlock PDF", () => {
         .getByRole("link", { name: "Unlock PDF" })
         .getAttribute("aria-current"),
     ).toBe("page");
-    expect(await page.getByText("PDF · up to 200 MB · stays on your device").isVisible()).toBe(
-      true,
-    );
+    expect(
+      await view(page).getByText("PDF · up to 200 MB · stays on your device").isVisible(),
+    ).toBe(true);
     // The password field only appears once we know the PDF needs one.
     expect(await page.locator("#pdf-form").isVisible()).toBe(false);
   });
