@@ -68,6 +68,12 @@ Everything is configured in one [`vite.config.ts`](./vite.config.ts) through [Vi
 
 The e2e tests need Chromium once: `vp exec playwright install chromium`.
 
+## Search engines
+
+`vp build` turns `index.html` into one file per page (`index`, `lock`, `share`, `about`) via `build/seo-pages.ts`. Each file gets its own title, description and Open Graph tags, and its view is visible without JavaScript. Page metadata lives in `src/shared/pages.ts`. One-time links (`/f/*`) get a separate `f.html` shell served by the Worker with `noindex`.
+
+**Set `SITE_URL` in `src/shared/pages.ts` to the public origin before deploying.** Until it's set, canonical links, `og:url`/`og:image` and `sitemap.xml` are left out, because they need absolute URLs.
+
 ## Deploy
 
 ```sh

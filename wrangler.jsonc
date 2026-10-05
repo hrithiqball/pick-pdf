@@ -5,8 +5,10 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"],
+    // /f/* gets the noindex share-link shell instead of the home page.
+    "run_worker_first": ["/api/*", "/f/*"],
   },
   "r2_buckets": [
     {

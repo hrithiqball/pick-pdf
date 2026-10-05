@@ -14,7 +14,7 @@ describe("upload page", () => {
   it("renders the upload form with labelled controls", async () => {
     const { page } = await open("/share");
 
-    expect(await page.title()).toBe("pick·pdf");
+    expect(await page.title()).toBe("Share a File with a One-Time Password Link | pick·pdf");
     expect(await page.getByRole("heading", { level: 1 }).textContent()).toBe("Seal a file");
     expect(
       await page.locator("#view-upload").getByLabel("Password", { exact: true }).isVisible(),

@@ -5,6 +5,7 @@ export type View =
   | "unlocked"
   | "lock"
   | "locked"
+  | "about"
   | "upload"
   | "shared"
   | "open"
@@ -24,6 +25,7 @@ const views: Record<View, HTMLElement> = {
   unlocked: $("view-unlocked"),
   lock: $("view-lock"),
   locked: $("view-locked"),
+  about: $("view-about"),
   upload: $("view-upload"),
   shared: $("view-shared"),
   open: $("view-open"),
@@ -36,6 +38,7 @@ const navFor: Partial<Record<View, string>> = {
   unlocked: "nav-unlock",
   lock: "nav-lock",
   locked: "nav-lock",
+  about: "nav-about",
   upload: "nav-share",
   shared: "nav-share",
 };

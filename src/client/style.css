@@ -130,6 +130,22 @@ body {
   text-decoration: none;
 }
 
+.nav a {
+  white-space: nowrap;
+}
+
+/* Narrow phones: "Unlock · Lock · Share · About". The full label stays the accessible name. */
+@media (max-width: 400px) {
+  .nav-extra {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 .nav a:hover {
   color: var(--ink);
   background: var(--paper-2);
@@ -147,6 +163,65 @@ body {
 
 main {
   flex: 1;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.explainer {
+  padding: 0 4px;
+  color: var(--ink-2);
+}
+
+.prose h2 {
+  margin: 32px 0 10px;
+  color: var(--ink);
+  font: 400 1.6rem/1.15 var(--serif);
+  letter-spacing: -0.01em;
+}
+
+.prose h2:first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin: 20px 0 4px;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  margin: 0 0 14px;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.3em;
+}
+
+.prose li + li {
+  margin-top: 4px;
+}
+
+.prose a:not(.as-button) {
+  color: var(--ink);
+  text-underline-offset: 3px;
+}
+
+.prose a:not(.as-button):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.prose .as-button {
+  margin-top: 10px;
 }
 
 .card {
@@ -643,11 +718,6 @@ legend {
   to {
     transform: translateX(300%);
   }
-}
-
-.footer {
-  color: var(--ink-3);
-  text-align: center;
 }
 
 @media (max-width: 480px) {

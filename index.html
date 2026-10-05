@@ -8,6 +8,8 @@
       content="Add or remove a PDF password, right in your browser. Your file never leaves your device."
     />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f4efe6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14120f" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,9 +24,10 @@
       <header class="masthead">
         <a class="brand" href="/" aria-label="pick·pdf home">pick<span>·</span>pdf</a>
         <nav class="nav" aria-label="Main">
-          <a href="/" id="nav-unlock">Unlock PDF</a>
-          <a href="/lock" id="nav-lock">Lock PDF</a>
-          <a href="/share" id="nav-share">Share a file</a>
+          <a href="/" id="nav-unlock">Unlock<span class="nav-extra"> PDF</span></a>
+          <a href="/lock" id="nav-lock">Lock<span class="nav-extra"> PDF</span></a>
+          <a href="/share" id="nav-share">Share<span class="nav-extra"> a file</span></a>
+          <a href="/about" id="nav-about">About</a>
         </nav>
       </header>
 
@@ -35,65 +38,96 @@
           </p></noscript
         >
         <!-- Unlock: pick a PDF, then a password if it needs one -->
-        <section id="view-unlock" class="card" aria-labelledby="unlock-title" hidden>
-          <h1 id="unlock-title" class="title" tabindex="-1">Unlock a PDF</h1>
-          <p class="lede">
-            Remove the password from a PDF you're allowed to open. It's done in your browser, so the
-            file and password never leave your device.
-          </p>
+        <div id="view-unlock" class="page" hidden>
+          <section class="card" aria-labelledby="unlock-title">
+            <h1 id="unlock-title" class="title" tabindex="-1">Unlock a PDF</h1>
+            <p class="lede">
+              Remove the password from a PDF you're allowed to open. It's done in your browser, so
+              the file and password never leave your device.
+            </p>
 
-          <div class="dropzone" id="pdf-dropzone">
-            <input
-              id="pdf-input"
-              class="visually-hidden"
-              type="file"
-              name="pdf"
-              accept="application/pdf,.pdf"
-            />
-            <label for="pdf-input" class="dropzone-label" id="pdf-dropzone-label">
-              <span class="dropzone-icon" aria-hidden="true">⚿</span>
-              <span class="dropzone-text"><strong>Choose a PDF</strong> or drop it here</span>
-              <span class="dropzone-hint mono" id="pdf-limit-hint"></span>
-            </label>
-            <div class="file-chip" id="pdf-chip" hidden>
-              <span class="file-chip-icon" aria-hidden="true">▤</span>
-              <span class="file-chip-meta">
-                <span class="file-chip-name" id="pdf-name"></span>
-                <span class="file-chip-size mono" id="pdf-size"></span>
-              </span>
-              <button type="button" class="link-button" id="pdf-clear">
-                Remove<span class="visually-hidden"> selected PDF</span>
-              </button>
-            </div>
-          </div>
-
-          <p class="status" id="pdf-status" aria-live="polite"></p>
-          <p class="error" id="pdf-error" role="alert"></p>
-
-          <form id="pdf-form" novalidate hidden>
-            <div class="field">
-              <label for="pdf-password">PDF password</label>
-              <div class="password-wrap">
-                <input
-                  id="pdf-password"
-                  name="password"
-                  type="password"
-                  autocomplete="off"
-                  required
-                />
-                <button
-                  type="button"
-                  class="reveal"
-                  data-reveal="pdf-password"
-                  aria-pressed="false"
-                >
-                  Show
+            <div class="dropzone" id="pdf-dropzone">
+              <input
+                id="pdf-input"
+                class="visually-hidden"
+                type="file"
+                name="pdf"
+                accept="application/pdf,.pdf"
+              />
+              <label for="pdf-input" class="dropzone-label" id="pdf-dropzone-label">
+                <span class="dropzone-icon" aria-hidden="true">⚿</span>
+                <span class="dropzone-text"><strong>Choose a PDF</strong> or drop it here</span>
+                <span class="dropzone-hint mono" id="pdf-limit-hint"></span>
+              </label>
+              <div class="file-chip" id="pdf-chip" hidden>
+                <span class="file-chip-icon" aria-hidden="true">▤</span>
+                <span class="file-chip-meta">
+                  <span class="file-chip-name" id="pdf-name"></span>
+                  <span class="file-chip-size mono" id="pdf-size"></span>
+                </span>
+                <button type="button" class="link-button" id="pdf-clear">
+                  Remove<span class="visually-hidden"> selected PDF</span>
                 </button>
               </div>
             </div>
-            <button type="submit" class="primary" id="pdf-submit">Unlock PDF</button>
-          </form>
-        </section>
+
+            <p class="status" id="pdf-status" aria-live="polite"></p>
+            <p class="error" id="pdf-error" role="alert"></p>
+
+            <form id="pdf-form" novalidate hidden>
+              <div class="field">
+                <label for="pdf-password">PDF password</label>
+                <div class="password-wrap">
+                  <input
+                    id="pdf-password"
+                    name="password"
+                    type="password"
+                    autocomplete="off"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="reveal"
+                    data-reveal="pdf-password"
+                    aria-pressed="false"
+                  >
+                    Show
+                  </button>
+                </div>
+              </div>
+              <button type="submit" class="primary" id="pdf-submit">Unlock PDF</button>
+            </form>
+          </section>
+
+          <section class="explainer prose" aria-labelledby="unlock-howto">
+            <h2 id="unlock-howto">How to remove a password from a PDF</h2>
+            <ol>
+              <li>Choose the PDF, or drop it on the box above.</li>
+              <li>Type the password you use to open it.</li>
+              <li>Download the unlocked copy. It opens without asking for a password.</li>
+            </ol>
+
+            <h2>Questions</h2>
+            <h3>Is it safe to unlock a PDF here?</h3>
+            <p>
+              Yes. The PDF is unlocked inside your browser, on your device. The file and its
+              password are never uploaded and never stored.
+              <a href="/about">Read why pick·pdf works this way.</a>
+            </p>
+            <h3>Can it unlock a PDF if I've forgotten the password?</h3>
+            <p>No. pick·pdf removes passwords you already know. It doesn't guess or crack them.</p>
+            <h3>My PDF opens, but won't let me print or copy. Can I fix that?</h3>
+            <p>
+              Yes. Choose it above and those print, copy and edit restrictions are removed straight
+              away, with no password needed.
+            </p>
+            <h3>Which PDFs work?</h3>
+            <p>
+              Any PDF protected with standard encryption (RC4 40 or 128-bit, AES-128 or AES-256), up
+              to 200 MB. Either the open password or the owner password will do.
+            </p>
+          </section>
+        </div>
 
         <!-- Unlocked -->
         <section id="view-unlocked" class="card" aria-labelledby="unlocked-title" hidden>
@@ -112,95 +146,131 @@
         </section>
 
         <!-- Lock: pick a PDF, choose a password -->
-        <section id="view-lock" class="card" aria-labelledby="lock-title" hidden>
-          <h1 id="lock-title" class="title" tabindex="-1">Lock a PDF</h1>
-          <p class="lede">
-            Add a password that's needed to open the PDF. It's encrypted in your browser with
-            AES-256, so the file and password never leave your device.
-          </p>
-
-          <div class="dropzone" id="lock-dropzone">
-            <input
-              id="lock-input"
-              class="visually-hidden"
-              type="file"
-              name="pdf"
-              accept="application/pdf,.pdf"
-            />
-            <label for="lock-input" class="dropzone-label" id="lock-dropzone-label">
-              <span class="dropzone-icon" aria-hidden="true">⚿</span>
-              <span class="dropzone-text"><strong>Choose a PDF</strong> or drop it here</span>
-              <span class="dropzone-hint mono" id="lock-limit-hint"></span>
-            </label>
-            <div class="file-chip" id="lock-chip" hidden>
-              <span class="file-chip-icon" aria-hidden="true">▤</span>
-              <span class="file-chip-meta">
-                <span class="file-chip-name" id="lock-name"></span>
-                <span class="file-chip-size mono" id="lock-size"></span>
-              </span>
-              <button type="button" class="link-button" id="lock-clear">
-                Remove<span class="visually-hidden"> selected PDF</span>
-              </button>
-            </div>
-          </div>
-
-          <p class="status" id="lock-status" aria-live="polite"></p>
-          <p class="error" id="lock-error" role="alert"></p>
-          <p class="status" id="lock-already" hidden>
-            This PDF already has a password. <a href="/">Unlock it first</a>, then lock it again
-            with a new one.
-          </p>
-
-          <form id="lock-form" novalidate hidden>
-            <div class="field">
-              <label for="lock-password">New password</label>
-              <div class="password-wrap">
-                <input
-                  id="lock-password"
-                  name="password"
-                  type="password"
-                  autocomplete="new-password"
-                  aria-describedby="lock-password-hint"
-                  required
-                />
-                <button
-                  type="button"
-                  class="reveal"
-                  data-reveal="lock-password lock-confirm"
-                  aria-pressed="false"
-                >
-                  Show
-                </button>
-              </div>
-              <p class="hint" id="lock-password-hint"></p>
-            </div>
-
-            <div class="field">
-              <label for="lock-confirm">Confirm password</label>
-              <input
-                id="lock-confirm"
-                name="confirm"
-                type="password"
-                autocomplete="new-password"
-                required
-              />
-            </div>
-
-            <label class="check">
-              <input type="checkbox" name="restrict" id="lock-restrict" />
-              <span>
-                Also block printing, copying and editing
-                <span class="check-note">Most PDF viewers respect this, but not all.</span>
-              </span>
-            </label>
-
-            <p class="note">
-              There's no way to recover a forgotten password. Keep it somewhere safe.
+        <div id="view-lock" class="page" hidden>
+          <section class="card" aria-labelledby="lock-title">
+            <h1 id="lock-title" class="title" tabindex="-1">Lock a PDF</h1>
+            <p class="lede">
+              Add a password that's needed to open the PDF. It's encrypted in your browser with
+              AES-256, so the file and password never leave your device.
             </p>
 
-            <button type="submit" class="primary" id="lock-submit">Lock PDF</button>
-          </form>
-        </section>
+            <div class="dropzone" id="lock-dropzone">
+              <input
+                id="lock-input"
+                class="visually-hidden"
+                type="file"
+                name="pdf"
+                accept="application/pdf,.pdf"
+              />
+              <label for="lock-input" class="dropzone-label" id="lock-dropzone-label">
+                <span class="dropzone-icon" aria-hidden="true">⚿</span>
+                <span class="dropzone-text"><strong>Choose a PDF</strong> or drop it here</span>
+                <span class="dropzone-hint mono" id="lock-limit-hint"></span>
+              </label>
+              <div class="file-chip" id="lock-chip" hidden>
+                <span class="file-chip-icon" aria-hidden="true">▤</span>
+                <span class="file-chip-meta">
+                  <span class="file-chip-name" id="lock-name"></span>
+                  <span class="file-chip-size mono" id="lock-size"></span>
+                </span>
+                <button type="button" class="link-button" id="lock-clear">
+                  Remove<span class="visually-hidden"> selected PDF</span>
+                </button>
+              </div>
+            </div>
+
+            <p class="status" id="lock-status" aria-live="polite"></p>
+            <p class="error" id="lock-error" role="alert"></p>
+            <p class="status" id="lock-already" hidden>
+              This PDF already has a password. <a href="/">Unlock it first</a>, then lock it again
+              with a new one.
+            </p>
+
+            <form id="lock-form" novalidate hidden>
+              <div class="field">
+                <label for="lock-password">New password</label>
+                <div class="password-wrap">
+                  <input
+                    id="lock-password"
+                    name="password"
+                    type="password"
+                    autocomplete="new-password"
+                    aria-describedby="lock-password-hint"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="reveal"
+                    data-reveal="lock-password lock-confirm"
+                    aria-pressed="false"
+                  >
+                    Show
+                  </button>
+                </div>
+                <p class="hint" id="lock-password-hint"></p>
+              </div>
+
+              <div class="field">
+                <label for="lock-confirm">Confirm password</label>
+                <input
+                  id="lock-confirm"
+                  name="confirm"
+                  type="password"
+                  autocomplete="new-password"
+                  required
+                />
+              </div>
+
+              <label class="check">
+                <input type="checkbox" name="restrict" id="lock-restrict" />
+                <span>
+                  Also block printing, copying and editing
+                  <span class="check-note">Most PDF viewers respect this, but not all.</span>
+                </span>
+              </label>
+
+              <p class="note">
+                There's no way to recover a forgotten password. Keep it somewhere safe.
+              </p>
+
+              <button type="submit" class="primary" id="lock-submit">Lock PDF</button>
+            </form>
+          </section>
+
+          <section class="explainer prose" aria-labelledby="lock-howto">
+            <h2 id="lock-howto">How to password-protect a PDF</h2>
+            <ol>
+              <li>Choose the PDF, or drop it on the box above.</li>
+              <li>Pick a password and type it twice.</li>
+              <li>
+                Download the locked copy. Anyone opening it will need the password, including you.
+              </li>
+            </ol>
+
+            <h2>Questions</h2>
+            <h3>How secure is the encryption?</h3>
+            <p>
+              pick·pdf uses AES-256, the strongest encryption the PDF standard offers. It opens in
+              Adobe Acrobat, Apple Preview, Chrome, Edge, Firefox and other modern PDF readers. A
+              long password you don't use anywhere else makes the most of it.
+            </p>
+            <h3>Is my PDF uploaded anywhere?</h3>
+            <p>
+              No. It's encrypted inside your browser and the file never leaves your device.
+              <a href="/about">Read more about privacy.</a>
+            </p>
+            <h3>Can I stop people printing or copying from it?</h3>
+            <p>
+              Tick “Also block printing, copying and editing”. Most PDF readers respect these
+              restrictions, but some don't, so the password is the real protection.
+            </p>
+            <h3>What if I forget the password?</h3>
+            <p>
+              It can't be recovered, by us or anyone else. Keep it somewhere safe, or keep an
+              unlocked copy.
+            </p>
+          </section>
+        </div>
 
         <!-- Locked -->
         <section id="view-locked" class="card" aria-labelledby="locked-title" hidden>
@@ -217,6 +287,75 @@
           </button>
           <a class="secondary as-button" href="/lock">Lock another PDF</a>
         </section>
+
+        <!-- About -->
+        <article id="view-about" class="card prose" aria-labelledby="about-title" hidden>
+          <h1 id="about-title" class="title" tabindex="-1">Why pick·pdf exists</h1>
+          <p class="lede">
+            Most free PDF tools online work by uploading your file to their servers. pick·pdf was
+            built because I didn't trust that with private documents.
+          </p>
+          <p>
+            The PDFs people need to unlock are rarely boring: bank statements, payslips, tax forms,
+            tenancy agreements, medical letters, ID scans. Once a file like that is uploaded to
+            someone else's server, you're relying on their promise about what happens next: how long
+            it's kept, who can read it, and where it ends up if they're breached. pick·pdf does the
+            job without ever needing to see the document.
+          </p>
+
+          <h2>Unlocking and locking never leave your device</h2>
+          <p>
+            When you unlock or lock a PDF, all the work happens inside your browser, using
+            <a href="https://github.com/qpdf/qpdf" rel="noopener">qpdf</a>, a long-standing
+            open-source PDF tool. The PDF and its password are <strong>never uploaded</strong>, and
+            nothing about them is <strong>stored</strong>: not on a server, not in your browser.
+            Close the tab and they're gone.
+          </p>
+          <p>
+            You can check this yourself. Open your browser's developer tools, watch the Network tab
+            and unlock a file: the only requests are for the page's own code.
+          </p>
+
+          <h2>Sharing: encrypted before it leaves, deleted after</h2>
+          <p>
+            “Share a file” is the one feature that uploads something, because the file has to reach
+            the other person. It's sealed in your browser first, with AES-256 encryption and a key
+            made from the password you choose. Only scrambled bytes are uploaded, and only for a
+            short time. They're deleted:
+          </p>
+          <ul>
+            <li>as soon as the recipient downloads the file,</li>
+            <li>after five wrong password attempts, or</li>
+            <li>when the expiry you picked runs out (7 days at most).</li>
+          </ul>
+          <p>
+            The password, the encryption key and even the file's name never reach the server. It
+            holds encrypted data and no key to open it, so nobody running it,
+            <strong>the developer included</strong>, can see what you sent. The file is decrypted on
+            the fly in the recipient's browser once they type the password.
+          </p>
+
+          <h2>What the server can see</h2>
+          <p>
+            For shared files: the encrypted file's size, when it was uploaded, and when it expires.
+            That's what's needed to deliver it and delete it on time. For unlocking and locking:
+            nothing, because no request is ever made. Like any website, the hosting provider
+            (Cloudflare) sees ordinary connection details, such as your IP address, when you load
+            the page.
+          </p>
+
+          <h2>Don't take my word for it</h2>
+          <p>
+            pick·pdf is open source.
+            <a href="https://github.com/hrithiqball/pick-pdf" rel="noopener"
+              >Read the code on GitHub</a
+            >
+            and see exactly what it does with your files.
+          </p>
+
+          <a class="primary as-button" href="/">Unlock a PDF</a>
+          <a class="secondary as-button" href="/lock">Lock a PDF</a>
+        </article>
 
         <!-- Upload -->
         <section id="view-upload" class="card" aria-labelledby="upload-title" hidden>
@@ -408,8 +547,6 @@
           <a class="primary as-button" href="/share">Seal a file</a>
         </section>
       </main>
-
-      <footer class="footer mono">Runs in your browser · powered by qpdf</footer>
     </div>
     <script type="module" src="/src/client/main.ts"></script>
   </body>

@@ -1,5 +1,6 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { defineConfig } from "vite-plus";
+import { seoPages } from "./build/seo-pages.ts";
 
 // One config for the whole toolchain: build/dev (Vite + Cloudflare), format (Oxfmt),
 // lint (Oxlint), tests (Vitest + Playwright) and project tasks (Vite Task).
@@ -13,6 +14,7 @@ export default defineConfig({
           persistState: process.env.E2E_PERSIST_DIR ? { path: process.env.E2E_PERSIST_DIR } : true,
           inspectorPort: false,
         }),
+        seoPages(),
       ],
 
   // The PDF unlocker runs qpdf in a module Web Worker.

@@ -221,7 +221,7 @@ describe("unlock PDF", () => {
 
     // Back returns to the unlocker.
     await page.goBack();
-    await page.getByRole("heading", { name: "Unlock a PDF" }).waitFor();
+    await page.getByRole("heading", { name: "Unlock a PDF", level: 1 }).waitFor();
   });
 
   it("fits a small phone screen without horizontal scrolling", async () => {

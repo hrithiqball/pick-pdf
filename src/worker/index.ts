@@ -37,6 +37,8 @@ export default {
 async function route(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const { pathname } = new URL(request.url);
 
+  if (pathname.startsWith("/f/")) return shareLinkPage(request, env);
+
   if (pathname === "/api/files") {
     return request.method === "POST" ? upload(request, env) : methodNotAllowed("POST");
   }
@@ -54,6 +56,18 @@ async function route(request: Request, env: Env, ctx: ExecutionContext): Promise
   }
 
   return json({ error: "not_found" }, 404);
+}
+
+/**
+ * One-time share links get their own HTML shell (built as f.html): a neutral title and
+ * noindex, rather than the home page's search snippet. The client router does the rest.
+ */
+async function shareLinkPage(request: Request, env: Env): Promise<Response> {
+  if (request.method !== "GET" && request.method !== "HEAD") return methodNotAllowed("GET");
+  const shell = await env.ASSETS.fetch(new URL("/f", request.url), { method: request.method });
+  const response = new Response(shell.body, shell);
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return response;
 }
 
 async function upload(request: Request, env: Env): Promise<Response> {
