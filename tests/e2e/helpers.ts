@@ -108,6 +108,7 @@ const wasmPath = new URL(
   "../../node_modules/@neslinesli93/qpdf-wasm/dist/qpdf.wasm",
   import.meta.url,
 ).pathname;
+const locate = () => wasmPath;
 
 export const fixturePath = (name: string) =>
   new URL(`../fixtures/${name}.pdf`, import.meta.url).pathname;
@@ -120,7 +121,6 @@ export async function inspectPdf(
   pdf: Uint8Array,
   password = "",
 ): Promise<{ encrypted: boolean; encryption: string; text: string }> {
-  const locate = () => wasmPath;
   const pw = `--password=${password}`;
   const check = await runQpdf([pw, "--is-encrypted", INPUT], pdf, locate);
   // A PDF that needs a password we didn't supply fails with "invalid password".

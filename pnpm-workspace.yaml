@@ -1,6 +1,6 @@
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@0.3.2
-  vite-plus: 0.3.2
+  vite: npm:@voidzero-dev/vite-plus-core@1.1.0
+  vite-plus: 1.1.0
 overrides:
   vite@*: "catalog:"
 peerDependencyRules:
@@ -12,3 +12,7 @@ allowBuilds:
   esbuild: true
   sharp: true
   workerd: true
+minimumReleaseAgeExclude:
+  - "@cloudflare/vite-plugin@1.63.2"
+  - miniflare@5.20261006.2-beta
+  - wrangler@4.150.0
